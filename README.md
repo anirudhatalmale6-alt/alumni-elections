@@ -166,6 +166,35 @@ supplied router:
 php -S 127.0.0.1:8400 -t public bin/dev_server.php
 ```
 
+### After deploying: check what is actually public
+
+```bash
+php bin/console.php selfcheck https://your-domain
+```
+
+This fetches the live site the way a stranger would and reports whether anything
+private can be downloaded — the database (every alumnus's email address and
+password hash), the mail log, the source, the test suite, a stray `.git`
+directory — and whether the public pages load.
+
+It asks the question that matters, "can somebody download this?", instead of
+assuming a config file is doing its job. Web server rules differ between hosts
+and some shared hosts ignore `.htaccess` altogether, so the only honest way to
+know is to make the request.
+
+It distinguishes two findings. **EXPOSED** means the file is downloadable right
+now. **IN WEB ROOT** means a `.php` file answered with an empty body because the
+server executed it rather than sending the text: nothing has leaked yet, but the
+file is reachable, and if PHP handling ever breaks — a host upgrade, a changed
+handler — the source is served as plain text. Both are worth fixing; neither is
+an "ok".
+
+A root `.htaccess` is included as a safety net for the common mistake of
+uploading the whole project into `public_html`. It is a second line of defence,
+not the answer, and it is the sort of thing that silently does nothing on some
+hosts — which is exactly why `selfcheck` measures the result rather than trusting
+it.
+
 ---
 
 ## Trying it out

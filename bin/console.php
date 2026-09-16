@@ -9,6 +9,7 @@ declare(strict_types=1);
  *   php bin/console.php roll-add     <email> [email ...]
  *   php bin/console.php seed-demo
  *   php bin/console.php verify-chain <election_id>
+ *   php bin/console.php selfcheck    <url>
  *   php bin/console.php stats
  */
 
@@ -138,6 +139,10 @@ switch ($cmd) {
         require __DIR__ . '/seed_demo.php';
         break;
 
+    case 'selfcheck':
+        require __DIR__ . '/selfcheck.php';
+        break;
+
     default:
         out('Commands:');
         out('  create-admin <email> <password> [name]');
@@ -145,6 +150,7 @@ switch ($cmd) {
         out('  roll-add     <email> [email ...]');
         out('  seed-demo                                          sample election + voters');
         out('  verify-chain <election_id>');
+        out('  selfcheck    <url>                                 after deploying: what is public?');
         out('  stats');
         break;
 }

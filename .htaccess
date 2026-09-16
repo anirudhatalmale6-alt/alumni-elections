@@ -1,0 +1,36 @@
+# Safety net for Apache and LiteSpeed.
+#
+# The web root is supposed to point at public/, and if it does this file is
+# never even read. It exists for the case where someone uploads the whole
+# project into public_html — a very common thing to do on shared hosting —
+# which would otherwise leave the database, the mail log and the source
+# downloadable by anyone who guesses the path.
+#
+# Treat this as a second line of defence, not as the answer. The answer is to
+# point the web root at public/. To find out which situation you are actually
+# in, deploy and then run:
+#
+#     php bin/console.php selfcheck https://your-domain
+#
+# That asks the live site what a stranger can download, rather than assuming
+# this file is doing its job. Rules like these vary between hosts, and some
+# shared hosts ignore them entirely.
+
+# Nothing in these folders should ever be served.
+RedirectMatch 404 ^/(data|src|bin|tests)(/|$)
+
+# Nor these file types, wherever they end up.
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|log|md)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Version control metadata.
+RedirectMatch 404 ^/\.git(/|$)
+
+Options -Indexes
