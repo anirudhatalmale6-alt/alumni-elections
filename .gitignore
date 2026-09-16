@@ -1,0 +1,10 @@
+# Runtime data — never commit a live election database or a mail log
+data/*.sqlite
+data/*.sqlite-wal
+data/*.sqlite-shm
+data/mail.log
+data/config.local.php
+
+# Uploaded candidate photos
+public/uploads/candidates/*
+!public/uploads/candidates/.gitkeep

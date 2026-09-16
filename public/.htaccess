@@ -1,0 +1,24 @@
+# Apache front controller. Anything that is not a real file on disk goes to
+# index.php, which does the routing.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Serve existing files (CSS, uploaded photos) straight from disk.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+</IfModule>
+
+# Never serve the SQLite database or the mail log, whatever the directory layout
+# turns out to be on the host.
+<FilesMatch "\.(sqlite|sqlite-wal|sqlite-shm|log)$">
+    Require all denied
+</FilesMatch>

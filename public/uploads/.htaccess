@@ -1,0 +1,16 @@
+# Uploaded candidate photos are re-encoded with GD before they are saved, so a
+# script cannot survive the upload. This is the second line of defence: even if
+# something did land here, the server must never execute it.
+
+php_flag engine off
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar
+
+<FilesMatch "\.(?!(jpe?g|png|gif|webp)$)[^.]*$">
+    Require all denied
+</FilesMatch>
