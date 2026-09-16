@@ -26,9 +26,21 @@ $locked = ballot_is_locked($e);
 <?php if ($locked): ?>
   <div class="alert alert-warn">
     <strong>The ballot paper is locked.</strong>
-    Voting has opened or ballots have already been cast, so positions and candidates can no longer be
-    added or removed. Changing the paper underneath people who have already voted would make the
-    result impossible to defend. Candidate wording and photos can still be corrected below.
+    Ballots have already been cast, so positions and candidates can no longer be added or removed.
+    Changing the paper underneath people who have already voted would make the result impossible to
+    defend. Candidate wording and photos can still be corrected below.
+  </div>
+<?php elseif ($phase === 'open'): ?>
+  <div class="alert alert-warn">
+    <strong>Voting is already open.</strong>
+    Nobody has voted yet, so you can still change the ballot — but any alumnus could vote at this
+    moment, and the paper locks permanently as soon as the first ballot arrives. If you are still
+    setting this election up, push the opening time back until you are ready.
+  </div>
+<?php elseif (!$structure): ?>
+  <div class="alert alert-info">
+    This election has no positions yet, so there is nothing to vote on. Add the positions and their
+    candidates below before voting opens.
   </div>
 <?php endif; ?>
 

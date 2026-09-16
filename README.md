@@ -77,10 +77,12 @@ was accepted and its receipt code — never the voter or the choice.
 in `cast_ballot()` itself and not only in the interface. This keeps the people
 running the election out of its result.
 
-**The ballot paper locks.** Once voting opens or any ballot is cast, positions
+**The ballot paper locks.** The moment the first ballot is recorded, positions
 and candidates can no longer be added or removed, and a candidate with votes
 cannot be deleted. Changing the paper underneath people who have already voted
-would make the result impossible to defend.
+would make the result impossible to defend. While an election is open but nobody
+has voted yet, the admin screen warns clearly that any alumnus could vote at that
+moment and that the paper locks as soon as one does.
 
 **The voting window is the server's clock.** Never the browser's. A ballot posted
 before the open time or after the close time is refused.
@@ -182,10 +184,24 @@ pictures of real or invented people. Replace them with real candidate photos.
 
 ## Tests
 
+213 assertions across four suites, all passing.
+
 ```bash
 php tests/run.php            # 107 assertions against a real SQLite database
-php tests/concurrency.php 16 # 16 processes racing to cast the same ballot
+php tests/concurrency.php 16 # 23 assertions: 16 processes racing to vote as one voter
+
+# Browser suites (need Playwright with Chromium, and the site running)
+php -S 127.0.0.1:8400 -t public bin/dev_server.php &
+BASE_URL=http://127.0.0.1:8400 python3 tests/browser/site_flows.py   # 68 assertions
+BASE_URL=http://127.0.0.1:8400 python3 tests/browser/admin_flows.py  # 15 assertions
 ```
+
+The browser suites provision the accounts they need, so they can be run over and
+over against the same database. `site_flows.py` registers a fresh alumnus through
+the real signup path each run, pulls the confirmation link out of `data/mail.log`
+and clicks it, then votes. `admin_flows.py` builds an election from nothing —
+including uploading a real candidate photo through the form and checking it is
+served back — and then votes in it.
 
 `tests/run.php` runs against a throwaway database file, not a mock, so the
 unique constraints and triggers that carry the integrity rules are the things

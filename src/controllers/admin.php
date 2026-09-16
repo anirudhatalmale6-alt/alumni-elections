@@ -202,13 +202,17 @@ function admin_election_archive(int $id): void
 /* ----------------------------------------------------------- positions --- */
 
 /**
- * Elections that have started must not have their ballot paper rewritten
- * underneath the people already voting on it.
+ * The ballot paper must not be rewritten underneath somebody who has already
+ * voted on it, so it locks the moment the first ballot is recorded.
+ *
+ * The test is votes cast, deliberately not "has the election opened". An admin
+ * who sets a start time that has already passed — which is the normal way to
+ * open voting immediately — would otherwise create an election they could never
+ * add a single candidate to, and it would be stuck that way for good.
  */
 function ballot_is_locked(array $e): bool
 {
-    return election_phase($e) !== 'upcoming'
-        || db_int('SELECT COUNT(*) FROM vote_receipts WHERE election_id = ?', [(int)$e['id']]) > 0;
+    return db_int('SELECT COUNT(*) FROM vote_receipts WHERE election_id = ?', [(int)$e['id']]) > 0;
 }
 
 function admin_position_create(int $electionId): void
