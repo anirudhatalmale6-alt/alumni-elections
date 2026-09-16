@@ -577,6 +577,36 @@ ok(is_file(dirname(__DIR__) . '/src/db.php'),
    'a photo path trying to escape the uploads folder cannot delete a source file');
 
 /* -------------------------------------------------------------------------- */
+group('Site address used in emailed links');
+
+config_set('base_url', '');
+ok(base_url_is_derived(), 'an unset base_url is reported as derived, so the admin screen can warn');
+eq('http://localhost:8080', base_url(),
+   'with no request to read (CLI), it falls back to a local default rather than an empty link');
+
+// Simulate a request. base_url() only consults these when nothing is configured.
+$_SERVER['HTTP_HOST'] = 'elections.example.org';
+$sapiIsCli = (PHP_SAPI === 'cli');
+
+config_set('base_url', 'https://configured.example.org/');
+ok(!base_url_is_derived(), 'a configured base_url is not reported as derived');
+eq('https://configured.example.org', base_url(),
+   'the configured value wins over anything in the request, and loses its trailing slash');
+
+config_set('base_url', 'https://configured.example.org');
+$link = null;
+$logPath = (string)config('mail_log');
+if (is_file($logPath)) { unlink($logPath); }
+mail_verification(['full_name' => 'Test', 'email' => 'someone@example.org'], 'TESTTOKEN123');
+$logged = (string)file_get_contents($logPath);
+ok(str_contains($logged, 'https://configured.example.org/verify?token=TESTTOKEN123'),
+   'the confirmation email carries an absolute link built from the configured address');
+ok(!str_contains($logged, 'localhost'),
+   'and no localhost address leaks into a message meant for a real alumnus');
+
+unset($_SERVER['HTTP_HOST']);
+
+/* -------------------------------------------------------------------------- */
 group('Mail never leaves the machine in log mode');
 
 $logFile = (string)config('mail_log');

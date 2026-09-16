@@ -44,7 +44,7 @@ function send_mail(string $to, string $subject, string $body): bool
 
 function mail_verification(array $user, string $token): void
 {
-    $url = rtrim((string)config('base_url'), '/') . '/verify?token=' . urlencode($token);
+    $url = base_url() . '/verify?token=' . urlencode($token);
     $body = "Hello " . ($user['full_name'] ?: 'there') . ",\n\n"
           . "An account was created for this address on " . config('site_name') . ".\n\n"
           . "Confirm your address to activate it:\n\n    " . $url . "\n\n"
@@ -54,7 +54,7 @@ function mail_verification(array $user, string $token): void
 
 function mail_password_reset(array $user, string $token): void
 {
-    $url = rtrim((string)config('base_url'), '/') . '/reset?token=' . urlencode($token);
+    $url = base_url() . '/reset?token=' . urlencode($token);
     $body = "Hello " . ($user['full_name'] ?: 'there') . ",\n\n"
           . "A password reset was requested for this address.\n\n"
           . "Set a new password here (the link is good for one hour):\n\n    " . $url . "\n\n"
@@ -64,7 +64,7 @@ function mail_password_reset(array $user, string $token): void
 
 function mail_account_approved(array $user): void
 {
-    $url = rtrim((string)config('base_url'), '/') . '/login';
+    $url = base_url() . '/login';
     $body = "Hello " . ($user['full_name'] ?: 'there') . ",\n\n"
           . "Your alumni account has been approved. You can sign in and vote in any open election:\n\n    "
           . $url . "\n";

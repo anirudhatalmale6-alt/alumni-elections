@@ -48,6 +48,41 @@ function now(): string
     return gmdate('Y-m-d H:i:s');
 }
 
+/**
+ * Absolute site URL with no trailing slash, for links that leave the site.
+ *
+ * Uses the configured value when there is one. Otherwise it is derived from the
+ * current request, which is what makes a fresh install send usable confirmation
+ * links before anything has been configured. A derived value is a convenience,
+ * not a security boundary — see config.php.
+ */
+function base_url(): string
+{
+    $configured = trim((string)config('base_url'));
+    if ($configured !== '') {
+        return rtrim($configured, '/');
+    }
+
+    if (PHP_SAPI !== 'cli' && !empty($_SERVER['HTTP_HOST'])) {
+        $https  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+               || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+        $scheme = $https ? 'https' : 'http';
+        // Strip anything that is not a plausible host:port before using it.
+        $host = preg_replace('/[^A-Za-z0-9.\-:\[\]]/', '', (string)$_SERVER['HTTP_HOST']);
+        if ($host !== '') {
+            return $scheme . '://' . $host;
+        }
+    }
+
+    return 'http://localhost:8080';
+}
+
+/** True when base_url is being guessed rather than configured. */
+function base_url_is_derived(): bool
+{
+    return trim((string)config('base_url')) === '';
+}
+
 function normalize_email(string $email): string
 {
     return mb_strtolower(trim($email), 'UTF-8');

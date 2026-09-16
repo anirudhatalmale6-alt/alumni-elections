@@ -19,6 +19,27 @@
   </div>
 </div>
 
+<?php if ($user['role'] === 'admin' && base_url_is_derived()): ?>
+  <div class="alert alert-warn">
+    <strong>Set the site address before you invite anybody.</strong>
+    Confirmation and password-reset emails currently use the address the browser asked for
+    (<span class="mono"><?= e(base_url()) ?></span>). That works, but it is guessed from each request.
+    Put the real address in <span class="mono">data/config.local.php</span> as
+    <span class="mono">'base_url' =&gt; 'https://your-domain'</span> so those links are always correct
+    and cannot be influenced by what a visitor sends.
+  </div>
+<?php endif; ?>
+
+<?php if ($user['role'] === 'admin' && config('mail_driver') === 'log'): ?>
+  <div class="alert alert-info">
+    <strong>Email is in test mode.</strong>
+    Messages are written to <span class="mono">data/mail.log</span> and nothing is actually sent, so
+    no half-finished invitation can reach an alumnus while you are setting up. Switch
+    <span class="mono">mail_driver</span> to <span class="mono">'mail'</span> when you are ready to
+    go live.
+  </div>
+<?php endif; ?>
+
 <div class="grid grid-3" style="margin-bottom:26px">
   <div class="stat">
     <div class="stat-value"><?= (int)$counts['eligible'] ?></div>

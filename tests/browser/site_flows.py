@@ -130,9 +130,11 @@ with sync_playwright() as pw:
     # Pull the confirmation link out of the mail log, exactly as a real
     # recipient would click it.
     mail = (pathlib.Path(APP_DIR) / "data" / "mail.log").read_text()
-    m = re.findall(r"(https?://\S+/verify\?token=[A-Za-z0-9]+)", mail)
+    m = re.findall(r"/verify\?token=([A-Za-z0-9]+)", mail)
     check(bool(m), "a confirmation email was produced with a verify link")
-    page.goto(m[-1])
+    # Visit the link against the host under test rather than whatever base_url
+    # the install is configured with, so the suite works on any port or domain.
+    page.goto(BASE + "/verify?token=" + m[-1])
     check("confirmed" in page.inner_text("body").lower(), "the link confirms the address")
     shot(page, "05c-verified")
 

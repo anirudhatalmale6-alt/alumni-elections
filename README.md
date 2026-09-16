@@ -127,6 +127,13 @@ return [
 ];
 ```
 
+**`base_url` matters more than it looks.** It is what confirmation and
+password-reset emails put in their links. Leave it empty and the site works the
+address out from each request, so a fresh install sends working links without any
+setup — but set it explicitly on the live site, because a derived value comes
+from the `Host` header the visitor sent, and an emailed link is the last place you
+want that. The admin dashboard shows a warning until you set it.
+
 `registration` decides who may hold an account:
 
 | value      | who can register                                            |
@@ -184,10 +191,10 @@ pictures of real or invented people. Replace them with real candidate photos.
 
 ## Tests
 
-213 assertions across four suites, all passing.
+219 assertions across four suites, all passing.
 
 ```bash
-php tests/run.php            # 107 assertions against a real SQLite database
+php tests/run.php            # 113 assertions against a real SQLite database
 php tests/concurrency.php 16 # 23 assertions: 16 processes racing to vote as one voter
 
 # Browser suites (need Playwright with Chromium, and the site running)

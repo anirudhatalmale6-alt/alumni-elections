@@ -79,7 +79,7 @@ switch ($cmd) {
         $name  = $argv[4] ?? 'Elections Administrator';
         $u = upsert_account($email, $pass, 'admin', $name);
         audit('user.created_cli', 'user', (int)$u['id'], ['email' => $email, 'role' => 'admin']);
-        out('Sign in at ' . config('base_url') . '/login');
+        out('Sign in at ' . base_url() . '/login');
         break;
 
     case 'create-user':

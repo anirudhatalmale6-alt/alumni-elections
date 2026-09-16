@@ -16,8 +16,14 @@ $config = [
     // Public name shown in the UI and in emails.
     'site_name'    => 'Alumni Elections',
 
-    // Absolute base URL, no trailing slash. Used for links inside verification emails.
-    'base_url'     => getenv('APP_BASE_URL') ?: 'http://localhost:8080',
+    // Absolute base URL, no trailing slash, used for the links inside
+    // verification and password-reset emails.
+    //
+    // Leave it empty and the site works it out from the incoming request, so a
+    // fresh install sends working links straight away. SET IT EXPLICITLY on the
+    // live site: it is the only way those links cannot be influenced by the Host
+    // header a visitor sends. The admin dashboard nags until you do.
+    'base_url'     => getenv('APP_BASE_URL') ?: '',
 
     // SQLite database file. The env var lets the test suite run against its own
     // file instead of the live one.
